@@ -1,0 +1,122 @@
+Hare Krishna! Setting up this automated system is incredibly rewarding once it's done. It will instantly send volunteer details to your Telegram app the moment they hit "Submit" on the form.
+
+Here is the exact step-by-step procedure to connect your Google Form to Telegram using Google Apps Script.
+
+Step 1: Create a Free Telegram Bot
+First, we need to create a bot on Telegram that will act as the "messenger" to send you the form details.
+
+Open the Telegram app on your phone or computer.
+
+In the search bar, search for @BotFather (it has a blue verified checkmark) and click Start.
+
+Type /newbot and send it.
+
+Give your bot a name (e.g., Jaganath Yatra Volunteers).
+
+Give your bot a username that ends in "bot" (e.g., IskconYatraAdmin_bot).
+
+BotFather will reply with a message containing your HTTP API Token (it will look something like 1234567890:ABCdefGhIJKlmNoPQRsTUVwxyZ).
+
+Copy this token and save it. ### Step 2: Get Your Personal Chat ID
+Your bot needs to know exactly who to send the message to. We need your personal Telegram ID.
+
+In Telegram, search for @userinfobot and click Start.
+
+It will instantly reply with your details. Look for the number next to Id: (e.g., 987654321).
+
+Copy this ID and save it.
+
+Go back to the search bar, search for the bot you created in Step 1 (e.g., @IskconYatraAdmin_bot), and click Start. (This gives your bot permission to message you).
+
+Step 3: Set Up the Google Sheet
+Go to your Google Form.
+
+Click on the Responses tab at the top.
+
+Click on the "Link to Sheets" button (a green spreadsheet icon) to create a new Google Sheet.
+
+Open the newly created Google Sheet.
+
+Make sure your column headers exactly match your form questions (e.g., "Full Name", "Mobile Number", "Select Service").
+
+Step 4: Add the Google Apps Script
+In your Google Sheet, look at the top menu and click Extensions > Apps Script.
+
+A new coding window will open. Delete any existing code there.
+
+Copy and paste the following code exactly as it is:
+
+JavaScript
+// REPLACE THESE TWO LINES WITH YOUR DETAILS FROM STEP 1 & 2
+const TELEGRAM_TOKEN = 'PASTE_YOUR_BOT_TOKEN_HERE';
+const CHAT_ID = 'PASTE_YOUR_CHAT_ID_HERE';
+
+function onFormSubmit(e) {
+  try {
+    // These names MUST match the column headers in your Google Sheet exactly
+    const name = e.namedValues['Full Name'] ? e.namedValues['Full Name'][0] : 'Not provided';
+    const mobile = e.namedValues['Mobile Number'] ? e.namedValues['Mobile Number'][0] : 'Not provided';
+    const service = e.namedValues['Select Service'] ? e.namedValues['Select Service'][0] : 'Not provided';
+
+    // Format the message for Telegram
+    const message = `🙏 *New Yatra Volunteer!*\n\n` +
+                    `*Name:* ${name}\n` +
+                    `*Mobile:* ${mobile}\n` +
+                    `*Service:* ${service}`;
+
+    sendToTelegram(message);
+  } catch (error) {
+    Logger.log(error.toString());
+  }
+}
+
+function sendToTelegram(text) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+  
+  const payload = {
+    chat_id: CHAT_ID,
+    text: text,
+    parse_mode: 'Markdown'
+  };
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload)
+  };
+
+  UrlFetchApp.fetch(url, options);
+}
+Important: Replace PASTE_YOUR_BOT_TOKEN_HERE and PASTE_YOUR_CHAT_ID_HERE with the actual Token and ID you saved earlier. Leave the single quotes around them!
+
+Click the Save icon (looks like a floppy disk) at the top.
+
+Step 5: Create the Automation Trigger
+Finally, we need to tell Google to run this code every time a form is submitted.
+
+On the left side of the Apps Script screen, click the Triggers icon (it looks like a clock or alarm).
+
+Click the big blue + Add Trigger button in the bottom right corner.
+
+Set up the trigger exactly like this:
+
+Choose which function to run: onFormSubmit
+
+Choose which deployment should run: Head
+
+Select event source: From spreadsheet
+
+Select event type: On form submit
+
+Click Save.
+
+Google Security Warning: Google will pop up a window asking you to choose your Google account. It will then show a scary-looking warning saying "Google hasn't verified this app."
+
+Click Advanced at the bottom.
+
+Click Go to Untitled project (unsafe).
+
+Scroll down and click Allow. (You are simply giving your own code permission to read your spreadsheet).
+
+You're Done! Test it out.
+Go back to your Google Form, fill it out as a test user, and click Submit. Within 2-3 seconds, you should receive a beautifully formatted message on your Telegram app!
