@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin: 0;
+      }
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      h2 {
+        text-align: center;
+        color: #FF9933; /* Saffron color */
+        margin-top: 0;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+      }
+      input, select {
+        width: 100%;
+        padding: 12px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        width: 100%;
+        padding: 14px;
+        background-color: #FF9933;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:disabled {
+        background-color: #cccccc;
+      }
+      #message {
+        margin-top: 15px;
+        text-align: center;
+        font-weight: bold;
+        color: #28a745;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🙏 Volunteer Registration</h2>
+      <p style="text-align: center; color: #666; font-size: 14px;">Jagannath Rath Yatra Services</p>
+      
+      <form id="volunteerForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required placeholder="Enter your name">
+        </div>
+        
+        <div class="form-group">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" id="mobile" name="mobile" required placeholder="10-digit number">
+        </div>
+        
+        <div class="form-group">
+          <label for="service">Select Service</label>
+          <select id="service" name="service" required>
+            <option value="" disabled selected>Choose a service...</option>
+            <option value="Food Distribution">Food Distribution (Prasadam)</option>
+            <option value="Crowd Management">Crowd Management</option>
+            <option value="Harinam">Harinam</option>
+            <option value="Kirtan">Kirtan</option>
+          </select>
+        </div>
+        
+        <button type="submit" id="submitBtn">Register Now</button>
+      </form>
+      
+      <div id="message"></div>
+    </div>
+
+    <script>
+      function handleFormSubmit(event) {
+        event.preventDefault(); // Prevents page reload
+        
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('message');
+        
+        // Change button state while submitting
+        btn.disabled = true;
+        btn.innerText = 'Sending details...';
+        msg.innerText = '';
+
+        const formObject = document.getElementById('volunteerForm');
+        
+        // Call the backend function in Code.gs
+        google.script.run
+          .withSuccessHandler(function(response) {
+            document.getElementById('volunteerForm').reset();
+            btn.disabled = false;
+            btn.innerText = 'Register Now';
+            msg.style.color = '#28a745';
+            msg.innerText = 'Hare Krishna! Registration successful.';
+          })
+          .withFailureHandler(function(error) {
+            btn.disabled = false;
+            btn.innerText = 'Register Now';
+            msg.style.color = 'red';
+            msg.innerText = 'Something went wrong. Please try again.';
+          })
+          .processForm(formObject);
+      }
+    </script>
+  </body>
+</html>
